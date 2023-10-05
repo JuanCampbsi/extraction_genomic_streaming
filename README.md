@@ -1,105 +1,65 @@
-# Projeto - Extração de Dados I
+# System for Monitoring Advances in the Field of Genomics
 
-<summary><h2>Contexto</h3></summary>
+<summary><h2>Context</h3></summary>
 
-Contexto:
-O grupo trabalha no time de engenharia de dados na HealthGen, uma empresa especializada em genômica e pesquisa de medicina personalizada. A genômica é o estudo do conjunto completo de genes de um organismo, desempenha um papel fundamental na medicina personalizada e na pesquisa biomédica. Permite a análise do DNA para identificar variantes genéticas e mutações associadas a doenças e facilita a personalização de tratamentos com base nas características genéticas individuais dos pacientes.
+The group works on the data engineering team at HealthGen, a leading company in the field of genomics and personalized medicine research. Genomics, which is the in-depth investigation of an organism's complete genome, serves as a cornerstone in personalized medicine and advanced biomedical initiatives. Through it, it is possible to dissect DNA, discovering genetic variants and mutations that may be linked to various diseases, providing a path to shaping treatments that specifically align with the patient's genetic profile.
 
-A empresa precisa se manter atualizada sobre os avanços mais recentes na genômica, identificar oportunidades para pesquisa e desenvolvimento de tratamentos personalizados e acompanhar as tendências em genômica que podem influenciar estratégias de pesquisa e desenvolvimento. Pensando nisso, o time de dados apresentou uma proposta de desenvolvimento de um sistema que coleta, analisa e apresenta as últimas notícias relacionadas à genômica e à medicina personalizada, e também estuda o avanço do campo nos últimos anos.
+With this in mind, this project uses modern tools such as Apache Kafka for real-time data streaming, the Databricks platform for collaborative analysis and the power of Apache Spark for distributed processing of big data. This system is capable of collecting, processing and analyzing the latest information and news about genomics and personalized medicine.
+
+Api: https://newsapi.org/v2/everything
+
+<summary><h2> Cluster management - Databricks</h2></summary>
+version_cluster: 14.0 (includes Apache Spark 3.5.0, Scala 2.12)
+
+To run the producer and consumer it is necessary to perform a few steps first, in the project files.
 
 
-<summary><h2>Criando váriaveis de ambiente - ENV</h3></summary>
+## Kafka_Management
 
-Usar arquivos .env em Python é uma prática comum para armazenar informações sensíveis ou configurações que não devem ser codificadas diretamente em seu código fonte. Nesse projeto estamos usando biblioteca python-dotenv para carregar variáveis de ambiente de um arquivo .env.
+1 - To install the `kafka`, rotate the first cell of the notebook:
 
 ```bash
-API_KEY= SUA_CHAVE_DE_API_AQUI
-
+  %sh 
+  sudo wget https://downloads.apache.org/kafka/3.4.1/kafka_2.12-3.5.1.tgzv
 ```
 
-<summary><h2>Execução com Ambiente Virtual</h2></summary>
-
-<details>
-<summary><h3>Linux</h3></summary>
-
-## Instale o virtualenv
-
-Para instalar o `virtualenv`, abra o terminal e execute o seguinte comando:
+2 - Extract the downloaded file
 
 ```bash
-pip install virtualenv
+  %sh 
+  tar -xvf kafka_2.12-3.5.1.tgz
 ```
 
-## Criação e Ativação de um Ambiente Virtual
-
-Abra o terminal e navegue até o diretório raiz do projeto, lá crie o ambiente com o seguinte comando:
+3 - Initialize Kafka
 
 ```bash
-virtualenv venv
+  %sh 
+  ./kafka_2.12-3.5.1/bin/kafka-server-start.sh ./kafka_2.12-3.5.1/config/server.properties
 ```
 
-Agora ative seu ambiente virtual:
+
+## ZooKeeper_Configuration
+
+1 - Run `zookeeper-server-start`, you need to install kafka before performing this step.
 
 ```bash
-source venv/bin/activate
+  %sh 
+  ./kafka_2.12-3.5.1/bin/zookeeper-server-start.sh ./kafka_2.12-3.5.1/config/zookeeper.properties
 ```
 
-## Instlação das ferraments necessárias:
 
-Agora você pode, ainda na pasta raiz, instalar as ferramentas necessárias para rodar a aplicação usando o arquivo requirements.txt:
+## Kafka_Producers
+
+1 - After kafka server and zookeeper are initialized, install `kafka-python`.
 
 ```bash
-pip install -r requirements.txt
+  %pip install kafka-python
 ```
 
-## Desativação do ambiente virtual:
-
-Para desativar seu ambiente virtual, basta executar o seguinte comando:
+2 - Rotate the topic creation cell.
 
 ```bash
-deactivate
+  %sh
+  ./kafka_2.12-3.5.1/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic topic_news --partitions 1 --replication-factor 1
 ```
-
-</details>
-
-<details>
-<summary><h3>Windows</h3></summary>
-
-## Instale o virtualenv
-
-Para instalar o `virtualenv`, abra o Prompt de Comando ou PowerShell como administrador e execute o seguinte comando:
-
-```bash
-pip install virtualenv
-```
-
-## Criação e Ativação de um Ambiente Virtual
-
-Abra o Prompt de Comando ou PowerShell e navegue até o diretório raiz do projeto, lá crie o ambiente com o seguinte comando:
-
-```bash
-virtualenv venv
-```
-
-Agora ative seu ambiente virtual:
-
-```bash
-venv/bin/activate
-```
-
-## Instlação das ferraments necessárias:
-
-Agora você pode, ainda na pasta raiz, instalar as ferramentas necessárias para rodar a aplicação usando o arquivo requirements.txt:
-
-```bash
-pip install -r requirements.txt
-```
-
-## Desativação do ambiente virtual:
-
-Para desativar seu ambiente virtual, basta executar o seguinte comando:
-
-```bash
-deactivate
-
 
